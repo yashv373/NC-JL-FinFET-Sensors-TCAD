@@ -1,0 +1,70 @@
+(sdegeo:set-auto-region-naming OFF)
+
+(sdegeo:create-cuboid (position 0 0 0) (position 0.064 0.026 0.05) "Silicon" "substrate")
+(sdegeo:create-cuboid (position 0 0 0.05) (position 0.064 0.026 0.06) "SiO2" "box")
+(sdegeo:create-cuboid (position 0 0.008 0.06) (position 0.064 0.018 0.089) "Silicon" "fin")
+(sdegeo:set-default-boolean "ABiB")
+
+"ABiB"
+
+(sdegeo:create-cuboid (position 0.017 0.0074 0.06) (position 0.047 0.0186 0.0896) "SiO2" "interfacial_oxide")
+(sdegeo:create-cuboid (position 0.017 0.00484 0.06) (position 0.047 0.02116 0.09216) "HfO2" "hfo2")
+(sdegeo:create-cuboid (position 0.017 0.00228 0.06) (position 0.047 0.02372 0.09472) "Metal" "gate1")
+(sdegeo:create-cuboid (position 0.012 0.00228 0.06) (position 0.017 0.02372 0.09472) "Si3N4" "drain_spacer")
+(sdegeo:create-cuboid (position 0.047 0.00228 0.06) (position 0.052 0.02372 0.09472) "Si3N4" "source_spacer")
+(sdegeo:create-cuboid (position 0 0.00228 0.06) (position 0.012 0.02372 0.09472) "TiN" "drain")
+(sdegeo:create-cuboid (position 0.052 0.00228 0.06) (position 0.064 0.02372 0.09472) "TiN" "source")
+
+(sdegeo:define-contact-set "gatec" 4 (color:rgb 1 0 0 ) "##")
+(sdegeo:define-contact-set "sourcec" 4 (color:rgb 1 1 0 ) "##")
+(sdegeo:define-contact-set "drainc" 4 (color:rgb 1 0 1 ) "##")
+(sdegeo:define-contact-set "bodyc" 4 (color:rgb 1 1 1 ) "##")
+(sdegeo:set-current-contact-set "gate")
+
+"none"
+
+(sdegeo:set-contact (list (car (find-face-id (position 0.032 0.013 0.09472)))) "gatec")
+(render:rebuild)
+(sdegeo:set-current-contact-set "drainc")
+"gatec"
+(sdegeo:set-contact (list (car (find-face-id (position 0.006 0.013 0.09472)))) "drainc")
+(render:rebuild)
+(sdegeo:set-current-contact-set "sourcec")
+"drainc"
+(sdegeo:set-contact (list (car (find-face-id (position 0.058 0.013 0.09472)))) "sourcec")
+(render:rebuild)
+(sdegeo:set-current-contact-set "bodyc")
+"sourcec"
+(sdegeo:set-contact (list (car (find-face-id (position 0.032 0.013 0)))) "bodyc")
+(render:rebuild)
+
+(sdedr:define-refeval-window "RefEvalWin_global" "Cuboid" (position -0.12 -0.12 -0.12) (position 0.12 0.12 0.12))
+(sdedr:define-refeval-window "RefEvalWin_sourcefin" "Cuboid" (position 0.052 0.008 0.06) (position 0.064 0.018 0.089))
+(sdedr:define-refeval-window "RefEvalWin_source_spacer_fin" "Cuboid" (position 0.047 0.008 0.06) (position 0.052 0.018 0.089))
+(sdedr:define-refeval-window "RefEvalWin_drain_fin" "Cuboid" (position 0 0.008 0.06) (position 0.012 0.018 0.089))
+(sdedr:define-refeval-window "RefEvalWin_drain_spacer" "Cuboid" (position 0.012 0.008 0.06) (position 0.017 0.018 0.089))
+(sdedr:define-refeval-window "RefEvalWin_hfo2" "Cuboid" (position 0.017 0.00484 0.06) (position 0.047 0.02116 0.09216))
+(sdedr:define-refeval-window "RefEvalWin_channel" "Cuboid" (position 0.017 0.008 0.06) (position 0.047 0.018 0.089))
+(sdedr:define-refeval-window "RefEvalWin_substrate" "Cuboid" (position 0 0 0) (position 0.064 0.026 0.050))
+
+(sdedr:define-constant-profile "ConstantProfileDefinition_source" "PhosphorusActiveConcentration" 2e19)
+(sdedr:define-constant-profile-placement "ConstantProfilePlacement_source" "ConstantProfileDefinition_source" "RefEvalWin_sourcefin")
+(sdedr:define-constant-profile "ConstantProfileDefinition_drain" "PhosphorusActiveConcentration" 2e19)
+(sdedr:define-constant-profile-placement "ConstantProfilePlacement_drain" "ConstantProfileDefinition_drain" "RefEvalWin_drain_fin")
+(sdedr:define-constant-profile "ConstantProfileDefinition_channel" "BoronActiveConcentration" 2e19)
+(sdedr:define-constant-profile-placement "ConstantProfilePlacement_channel" "ConstantProfileDefinition_channel" "RefEvalWin_channel")
+(sdedr:define-constant-profile "ConstantProfileDefinition_src_spacer_fin" "PhosphorusActiveConcentration" 2e19)
+(sdedr:define-constant-profile-placement "ConstantProfilePlacement_src_spacer_fin" "ConstantProfileDefinition_src_spacer_fin" "RefEvalWin_src_spacer_fin")
+(sdedr:define-constant-profile "ConstantProfileDefinition_drain_spacer_fin" "PhosphorusActiveConcentration" 2e19)
+(sdedr:define-constant-profile-placement "ConstantProfilePlacement_drain_spacer_fin" "ConstantProfileDefinition_drain_spacer_fin" "RefEvalWin_drain_spacer")
+
+(sdedr:define-refinement-size "RefinementDefinition_global" 0.25 0.25 0.25 0.1 0.1 0.1 )
+(sdedr:define-refinement-placement "RefinementPlacement_global" "RefinementDefinition_global" (list "window" "RefEvalWin_global" ) )
+("RefinementPlacement_global")
+(sdedr:define-refinement-function "RefinementDefinition_global" "MaxLenInt" "interfacial_oxidehfo2gate1" "fininterfacial_oxidehfo2gate1" 0.001 1.5 "DoubleSide" "UseRegionNames")
+(sdedr:define-refinement-function "RefinementDefinition_global" "DopingConcentration" "MaxTransDiff" 1)
+(sdedr:define-refinement-size "RefinementDefinition_channel" 0.1 0.0125 0.1 0.1 0.0025 0.1 )
+(sdedr:define-refinement-placement "RefinementPlacement_channel" "RefinementDefinition_channel" (list "window" "RefEvalWin_channel" ) )
+("RefinementPlacement_channel")
+(sdedr:define-refinement-function "RefinementDefinition_channel" "MaxLenInt" "interfacial_oxidehfo2gate1" "fininterfacial_oxidehfo2gate1" 0.0002 1.5 "DoubleSide" "UseRegionNames")
+(sdedr:define-refinement-function "RefinementDefinition_channel" "DopingConcentration" "MaxTransDiff" 1)
